@@ -10,7 +10,7 @@ I used python 3.6.5 on Ubuntu 18.04 LTS
 To clone it on your local machine,
 
 Clone this repository to your local machine.
-git clone https://github.com/samip584/4_in_a_row
+git clone https://github.com/samip584/Four-in-a-row.git
 Go inside the directory where you placed the cloned repo
 Compile "4_in_a_row.py"
 Further Improvements
