@@ -1,0 +1,20 @@
+Battleships
+A Four in a row multiplayer game, your goal is to defeat your enemy by making 4 of your charecter occur consicutively horizontal vertical or diagonal.
+(Single player soon to come)
+
+You lose when your opponent makes four in a row.
+
+Development
+I used python 3.6.5 on Ubuntu 18.04 LTS
+
+To clone it on your local machine,
+
+Clone this repository to your local machine.
+git clone https://github.com/samip584/4_in_a_row
+Go inside the directory where you placed the cloned repo
+Compile "4_in_a_row.py"
+Further Improvements
+If you're interested, feel free to fork and submit PR.
+
+PS
+I am still new to git and github so my commit messages might not be that good (or detailed)worried....but enjoy the game
