@@ -1,6 +1,8 @@
 from os import system
 import Arrow
+import random
 
+#matrix denoting the board of the 4 in a row game
 board = [
 		[0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0],
@@ -15,13 +17,19 @@ def main():
 	system("clear")
 	play()
 
+#main game play
 def play():
+	#players symbols
 	player = ['*', '#']
-	turn = 0
+	#random number to decide which player is first
+	turn = random.randint(0,1)
+	#row to arrange move in board
 	insert_row = [player[turn],0,0,0,0,0,0]
+	#counter to find the position to insert the charecter
 	count = 0
-	while(1):
-		print("\tFOUR IN A ROW\n\n")
+	while(1): 
+		print("\tFOUR IN A ROW\n")
+		print("      Arrow keys to play\n\n")
 		display_insert_row(insert_row)
 		display_board()
 		while(1):
@@ -49,6 +57,7 @@ def play():
 				break
 		system("clear")
 
+#attempts to makes changes in board and returns if the board has changed or not 
 def board_enhancement_and_return_change_decision(count, player):
 	row = 6
 	while(row >= 0):
@@ -59,6 +68,7 @@ def board_enhancement_and_return_change_decision(count, player):
 			row -= 1
 	return 'No'
 
+#checks if the current player won
 def check_victory():
 	for i in range(7):
 		for j in range(4):
@@ -73,6 +83,7 @@ def check_victory():
 			if board[6-i][j] == board[5-i][j+1] and board[6-i][j] == board[4-i][j+2] and board[6-i][j] == board[3-i][j+3] and board[6-i][j] != 0:
 				return("WON")
 
+#displays the board
 def display_board():
     print("-"*29)
     for index, row in enumerate(board):
@@ -82,6 +93,7 @@ def display_board():
         else:
         	print("|" + "---+"*6 + "---|")
 
+#prints the row at which shows where the current symbol might be inserted
 def display_insert_row(insert_row):
     print((" " + " {}  "*7).format(*[x if x != 0 else " " for x in insert_row]))
 
