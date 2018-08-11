@@ -96,18 +96,16 @@ def computer_enters():		#computer generates places to enter
 	display_board()
 	time.sleep(0.25) 	# delays for 0.25 seconds
 	title()
-	while True:
-		spot = victory_spot()		#checks for any place where the computer can win 
-		if(spot == 7):
-			spot = dangerous_spot()		#checks for any place where the computer may loose
-		if(spot == 7):
-			spot = predict_for_next_victory()		#checks for any place where the computer can win in next turn
-		if(spot == 7):
-			spot = pick_random_spot()		#checks for any random place where the computer can wont loose in the players turn
-		change = board_enhancement_and_return_change_decision(spot, player[turn]) 		#modifies the board
-		if(change == 'Yes'):
-			turn = (turn + 1) % 2
-		break	
+	spot = victory_spot()		#checks for any place where the computer can win 
+	if(spot == 7):
+		spot = dangerous_spot()		#checks for any place where the computer may loose
+	if(spot == 7):
+		spot = predict_for_next_victory()		#checks for any place where the computer can win in next turn
+	if(spot == 7):
+		spot = pick_random_spot()		#checks for any random place where the computer can wont loose in the players turn
+	change = board_enhancement_and_return_change_decision(spot, player[turn]) 		#modifies the board
+	if(change == 'Yes'):
+		turn = (turn + 1) % 2
 	display_board()
 
 
@@ -186,6 +184,7 @@ def player_enters():	#humans enter the place to insurt
 			change = board_enhancement_and_return_change_decision(count, player[turn])
 			if(change == 'Yes'):
 				turn = (turn + 1) % 2
+				return
 			break
 
 		
