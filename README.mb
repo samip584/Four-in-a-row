@@ -1,6 +1,6 @@
 Four in a row
-A Four in a row multiplayer game and single player game, your goal is to defeat your enemy by making 4 of your charecter occur consicutively horizontal vertical or diagonal.
-You can play against an opponent or just the computer
+It’s a simple strategical multiplayer and single player game, your goal is to defeat your enemy by making 4 of your character occur consecutively horizontal vertical or diagonal.
+You can play against an opponent in multiplayer mode or just a simple AI in the single player mode.
 
 You lose when your opponent makes four in a row.
 
