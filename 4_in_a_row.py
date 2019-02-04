@@ -175,21 +175,21 @@ def player_enters():	#humans enter the place to insurt
 		for event in pygame.event.get():
 			if event.type ==pygame.QUIT:
 				sys.exit()
-			if event.type ==pygame.KEYDOWN:
-				if event.key == 275:
-					count = (count + 1) % 7
-					break
-				elif event.key == 276:
-					temp_count = (count - 1)
-					if(temp_count < 0): temp_count = 6
-					count = temp_count
-					break
-				elif event.key == 274:
-					change = board_enhancement_and_return_change_decision(count, player[turn])
-					if(change == 'Yes'):
-						turn = (turn + 1) % 2
-						return
-					break
+			key = pygame.key.get_pressed()
+			if key[pygame.K_RIGHT]:
+				count = (count + 1) % 7
+				break
+			elif key[pygame.K_LEFT]:
+				temp_count = (count - 1)
+				if(temp_count < 0): temp_count = 6
+				count = temp_count
+				break
+			elif key[pygame.K_DOWN]:
+				change = board_enhancement_and_return_change_decision(count, player[turn])
+				if(change == 'Yes'):
+					turn = (turn + 1) % 2
+					return
+				break
 			display_insert_row(count)
 
 
