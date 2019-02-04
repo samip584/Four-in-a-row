@@ -2,6 +2,7 @@ from os import system
 import random
 import time
 import pygame
+import pygame.gfxdraw
 import Arrow
 import sys
 
@@ -14,6 +15,9 @@ pygame.init()
 square_size = 50
 
 largeText = pygame.font.Font('freesansbold.ttf',45)
+midText = pygame.font.Font('freesansbold.ttf',35)
+smallText = pygame.font.Font('freesansbold.ttf',15)
+
 width = square_size * 7
 height = square_size * 9
 play_ring_radious = int((square_size / 2) - 1)
@@ -23,32 +27,42 @@ screen = pygame.display.init()
 def main_screan():
 	global screen
 	index_count = 0		#tracks where the index is placed
-	indicator_psition = ['->', 0, 0]		#the list which shows where the index is tracked
+	screen = pygame.display.set_mode(size)
+	game_mode = ['SINGLEPLAYER', 'MULTIPLAYER', 'EXIT']		#different gamemodes player can select
+	pygame.display.update()
 	#The below loop Displays the main screen
 	while True:
-		system("clear")
-		print("\t!!!! Four in a row !!!!\n\n")
-		game_mode = ['Single Player', '2 Players', 'Exit']		#different gamemodes player can select
-		for indicator,mode in zip(indicator_psition,game_mode):		#options display with index
-			print(("\t" +" {}  "+mode).format(*[indicator if indicator != 0 else "  "]))
-		#The below scripts changes the index according to up and down arrow pressed and selects usning the right arrow
-		select_dir = Arrow.get()
-		if select_dir == 'down':
-				indicator_psition[(index_count + 1) % 3], indicator_psition[index_count] = indicator_psition[index_count], indicator_psition[(index_count + 1) % 3]
+		for event in pygame.event.get():
+			if event.type ==pygame.QUIT:
+				sys.exit()
+			#The below scripts changes the index according to up and down arrow pressed and selects usning the right arrow
+			screen.fill((200, 200, 200))
+			TextSurf, TextRect = text_objects("FOUR IN A ROW", largeText, (0,0,0))
+			TextRect.center = ((width/2),int(30))
+			screen.blit(TextSurf, TextRect)
+			for mode in game_mode:
+				TextSurf, TextRect = text_objects(mode, midText, (200, 0, 0) if mode == "SINGLEPLAYER" else (0, 0, 200) if mode == "MULTIPLAYER" else (200, 200, 0))
+				TextRect.center = ((width/2), int((1 + (2 * (game_mode.index(mode) + 1)))*square_size))
+				screen.blit(TextSurf, TextRect)
+			key = pygame.key.get_pressed()
+			if key[pygame.K_DOWN]:
 				index_count = (index_count + 1) % 3
-		elif select_dir == 'up':
-			temp_count = (index_count - 1)
-			if(temp_count < 0): temp_count = 2
-			indicator_psition[temp_count], indicator_psition[index_count] = indicator_psition[index_count], indicator_psition[temp_count]
-			index_count = temp_count
-		elif select_dir == 'right':
-			screen = pygame.display.set_mode(size)
-			if index_count == 0:
-				single_player()
-			elif index_count == 1:
-				multi_player()
-			elif index_count == 2:
-				return 
+				break
+			elif key[pygame.K_UP]:
+				temp_count = (index_count - 1)
+				if(temp_count < 0): temp_count = 2
+				index_count = temp_count
+				break
+			elif key[pygame.K_RETURN ]:
+				if index_count == 0:
+					single_player()
+				elif index_count == 1:
+					multi_player()
+				elif index_count == 2:
+					sys.exit()
+					
+			pygame.gfxdraw.rectangle(screen,(0, int((1 + 2 * (index_count + 1))*square_size - square_size / 2), square_size * 7 , square_size), (200, 0, 0) if index_count == 0 else (0, 0, 200) if index_count == 1 else (200, 200, 0))
+			pygame.display.update()
 
 
 def multi_player():		#multiplayer game play
@@ -68,7 +82,7 @@ def multi_player():		#multiplayer game play
 			#below codes show which player won
 			display_board()
 			display_victory()
-			return
+			main_screan()
 
 		
 def single_player():
@@ -91,7 +105,7 @@ def single_player():
 			#below codes show which player won
 			display_board()
 			display_victory()
-			return
+			main_screan()
 
 
 
@@ -224,38 +238,49 @@ def title():		#displays the title of the game
 	print("\tFOUR IN A ROW\n")
 	print("      Arrow keys to play\n\n")
 
-def text_objects(text, font):
-    textSurface = font.render(text, True, (255,255,255))
+def text_objects(text, font, color):
+    textSurface = font.render(text, True, color)
     return textSurface, textSurface.get_rect()
 
 
 def display_board():		##displays the board
-	TextSurf, TextRect = text_objects("FOUR IN A ROW", largeText)
+	screen.fill((0, 0, 0))
+	TextSurf, TextRect = text_objects("FOUR IN A ROW", largeText, (255,255,255))
 	TextRect.center = ((width/2),int(30))
 	screen.blit(TextSurf, TextRect)
 	for column in range(7):
 		for row in range(7):
 			pygame.draw.rect(screen,(50, 0, 200), (column* square_size, row*square_size + 2 * square_size, square_size, square_size))
-			pygame.draw.circle(screen,(0, 0, 0), (int(column* square_size + (square_size / 2)), int(row*square_size + (5 * square_size / 2))), play_ring_radious)
+			pygame.gfxdraw.aacircle(screen, int(column* square_size + (square_size / 2)),int(row*square_size + (5 * square_size / 2)),play_ring_radious,(0, 0, 0))
+			pygame.gfxdraw.filled_circle(screen, int(column* square_size + (square_size / 2)),int(row*square_size + (5 * square_size / 2)),play_ring_radious,(0, 0, 0))
 			if(board[row][column] == '*'):
-				pygame.draw.circle(screen,(200, 200, 0), (int(column* square_size + (square_size / 2)), int(row*square_size + (5 * square_size / 2))), play_ring_radious)
+				pygame.gfxdraw.aacircle(screen, int(column* square_size + (square_size / 2)),int(row*square_size + (5 * square_size / 2)),play_ring_radious,(200, 200, 0))
+				pygame.gfxdraw.filled_circle(screen, int(column* square_size + (square_size / 2)),int(row*square_size + (5 * square_size / 2)),play_ring_radious,(200, 200, 0))
 			elif(board[row][column] == 'o'):
-				pygame.draw.circle(screen,(200, 0, 0), (int(column* square_size + (square_size / 2)), int(row*square_size + (5 * square_size / 2))), play_ring_radious)
+				pygame.gfxdraw.aacircle(screen, int(column* square_size + (square_size / 2)),int(row*square_size + (5 * square_size / 2)),play_ring_radious,(200, 0, 0))
+				pygame.gfxdraw.filled_circle(screen, int(column* square_size + (square_size / 2)),int(row*square_size + (5 * square_size / 2)),play_ring_radious,(200, 0, 0))
 	pygame.display.update()
 
 def display_insert_row(count):			#prints the row at which shows where the current symbol might be inserted
 	pygame.draw.rect(screen,(0, 0, 0), (0, square_size, square_size * 7, square_size))
-	pygame.draw.circle(screen,(200, 200, 0) if player[turn] == "*"  else (200, 0, 0), (int(count* square_size + (square_size / 2)), int(1*square_size + (square_size / 2))), play_ring_radious)
+	pygame.gfxdraw.aacircle(screen, int(count* square_size + (square_size / 2)),int(1*square_size + (square_size / 2)),play_ring_radious,(200, 200, 0) if player[turn] == "*"  else (200, 0, 0))
+	pygame.gfxdraw.filled_circle(screen, int(count* square_size + (square_size / 2)),int(1*square_size + (square_size / 2)),play_ring_radious,(200, 200, 0) if player[turn] == "*"  else (200, 0, 0))
 	pygame.display.update()
 
 def display_victory():
 	screen.fill((0, 0, 0))
-	TextSurf, TextRect = text_objects("FOUR IN A ROW", largeText)
+	TextSurf, TextRect = text_objects("FOUR IN A ROW", largeText, (255,255,255))
 	TextRect.center = ((width/2),int(30))
 	screen.blit(TextSurf, TextRect)
-	pygame.draw.circle(screen,(200, 200, 0) if player[(turn + 1) % 2 ] == "*"  else (200, 0, 0), (int(width / 2 - 120), int(height/2 - 5)), play_ring_radious)
-	TextSurf, TextRect = text_objects(" WON", largeText)
+	
+	pygame.gfxdraw.aacircle(screen, int(width / 2 - 120),int(height/2 - 5),play_ring_radious,(200, 200, 0) if player[(turn + 1) % 2 ] == "*"  else (200, 0, 0))
+	pygame.gfxdraw.filled_circle(screen, int(width / 2 - 120),int(height/2 - 5),play_ring_radious,(200, 200, 0) if player[(turn + 1) % 2 ] == "*"  else (200, 0, 0))
+	TextSurf, TextRect = text_objects(" WON", largeText, (200, 200, 0) if player[(turn + 1) % 2 ] == "*"  else (200, 0, 0))
 	TextRect.center = ((width/2),(height/2))
+	screen.blit(TextSurf, TextRect)
+
+	TextSurf, TextRect = text_objects("Wait for 2 seconds", smallText, (255,255,255))
+	TextRect.center = ((width/2),(height-10))
 	screen.blit(TextSurf, TextRect)
 
 	pygame.display.update()
