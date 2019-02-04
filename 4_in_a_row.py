@@ -1,19 +1,30 @@
 from os import system
 import random
 import time
+import pygame
 import Arrow
-
+import sys
 
 board = []		#matrix denoting the board of the 4 in a row game
 player = ['*', 'o']		#players symbols
 turn = 0		#defining turn and count as global
 count = 0
-insert_row = [0,0,0,0,0,0,0]		#defining the row which denotes the top bar where player can moove its symbol and select where to insert the symbol
+
+pygame.init()
+square_size = 50
+
+largeText = pygame.font.Font('freesansbold.ttf',45)
+width = square_size * 7
+height = square_size * 9
+play_ring_radious = int((square_size / 2) - 1)
+size = (width, height)
+screen = pygame.display.init()
 
 def main_screan():
+	global screen
 	index_count = 0		#tracks where the index is placed
 	indicator_psition = ['->', 0, 0]		#the list which shows where the index is tracked
-	#The below loop Displays the main screan
+	#The below loop Displays the main screen
 	while True:
 		system("clear")
 		print("\t!!!! Four in a row !!!!\n\n")
@@ -31,6 +42,7 @@ def main_screan():
 			indicator_psition[temp_count], indicator_psition[index_count] = indicator_psition[index_count], indicator_psition[temp_count]
 			index_count = temp_count
 		elif select_dir == 'right':
+			screen = pygame.display.set_mode(size)
 			if index_count == 0:
 				single_player()
 			elif index_count == 1:
@@ -54,11 +66,8 @@ def multi_player():		#multiplayer game play
 		player_enters()
 		if check_victory() == 'WON':
 			#below codes show which player won
-			system("clear")
-			print("\tFOUR IN A ROW\n\n")
 			display_board()
-			print(player[(turn + 1) % 2],"player WON")
-			Arrow.get()
+			display_victory()
 			return
 
 		
@@ -80,11 +89,8 @@ def single_player():
 			player_enters()
 		if check_victory() == 'WON':
 			#below codes show which player won
-			system("clear")
-			print("\tFOUR IN A ROW\n\n")
 			display_board()
-			print(player[(turn + 1) % 2],"player WON")
-			Arrow.get()
+			display_victory()
 			return
 
 
@@ -164,28 +170,28 @@ def player_enters():	#humans enter the place to insurt
 	global turn
 	global count
 	title()
-	insert_row = [0,0,0,0,0,0,0]
-	insert_row[count] = player[turn]		#to indicate whoose turn it is the players is shown above the board and indicates where the player is to insert 
-	display_insert_row(insert_row)
 	display_board()
 	while True:		#This loop changes the index in the insert row according to right and left arrow pressed and tries to insert with down key 
-		shift_dir = Arrow.get()
-		if shift_dir == 'right':
-			insert_row[(count + 1) % 7], insert_row[count] = insert_row[count], insert_row[(count + 1) % 7]
-			count = (count + 1) % 7
-			break
-		elif shift_dir == 'left':
-			temp_count = (count - 1)
-			if(temp_count < 0): temp_count = 6
-			insert_row[count], insert_row[temp_count] = insert_row[temp_count], insert_row[count]
-			count = temp_count
-			break
-		elif shift_dir == 'down':
-			change = board_enhancement_and_return_change_decision(count, player[turn])
-			if(change == 'Yes'):
-				turn = (turn + 1) % 2
-				return
-			break
+		for event in pygame.event.get():
+			if event.type ==pygame.QUIT:
+				sys.exit()
+			if event.type ==pygame.KEYDOWN:
+				if event.key == 275:
+					count = (count + 1) % 7
+					break
+				elif event.key == 276:
+					temp_count = (count - 1)
+					if(temp_count < 0): temp_count = 6
+					count = temp_count
+					break
+				elif event.key == 274:
+					change = board_enhancement_and_return_change_decision(count, player[turn])
+					if(change == 'Yes'):
+						turn = (turn + 1) % 2
+						return
+					break
+			display_insert_row(count)
+
 
 		
 
@@ -218,17 +224,43 @@ def title():		#displays the title of the game
 	print("\tFOUR IN A ROW\n")
 	print("      Arrow keys to play\n\n")
 
-def display_board():		##displays the board
-    print("-"*29)
-    for index, row in enumerate(board):
-        print(("|" + " {} |"*7).format(*[x if x != 0 else " " for x in row]))
-        if index == 6:
-            print("-"*29) 
-        else:
-        	print("|" + "---+"*6 + "---|")
+def text_objects(text, font):
+    textSurface = font.render(text, True, (255,255,255))
+    return textSurface, textSurface.get_rect()
 
-def display_insert_row(insert_row):			#prints the row at which shows where the current symbol might be inserted
-    print((" " + " {}  "*7).format(*[x if x != 0 else " " for x in insert_row]))
+
+def display_board():		##displays the board
+	TextSurf, TextRect = text_objects("FOUR IN A ROW", largeText)
+	TextRect.center = ((width/2),int(30))
+	screen.blit(TextSurf, TextRect)
+	for column in range(7):
+		for row in range(7):
+			pygame.draw.rect(screen,(50, 0, 200), (column* square_size, row*square_size + 2 * square_size, square_size, square_size))
+			pygame.draw.circle(screen,(0, 0, 0), (int(column* square_size + (square_size / 2)), int(row*square_size + (5 * square_size / 2))), play_ring_radious)
+			if(board[row][column] == '*'):
+				pygame.draw.circle(screen,(200, 200, 0), (int(column* square_size + (square_size / 2)), int(row*square_size + (5 * square_size / 2))), play_ring_radious)
+			elif(board[row][column] == 'o'):
+				pygame.draw.circle(screen,(200, 0, 0), (int(column* square_size + (square_size / 2)), int(row*square_size + (5 * square_size / 2))), play_ring_radious)
+	pygame.display.update()
+
+def display_insert_row(count):			#prints the row at which shows where the current symbol might be inserted
+	pygame.draw.rect(screen,(0, 0, 0), (0, square_size, square_size * 7, square_size))
+	pygame.draw.circle(screen,(200, 200, 0) if player[turn] == "*"  else (200, 0, 0), (int(count* square_size + (square_size / 2)), int(1*square_size + (square_size / 2))), play_ring_radious)
+	pygame.display.update()
+
+def display_victory():
+	screen.fill((0, 0, 0))
+	TextSurf, TextRect = text_objects("FOUR IN A ROW", largeText)
+	TextRect.center = ((width/2),int(30))
+	screen.blit(TextSurf, TextRect)
+	pygame.draw.circle(screen,(200, 200, 0) if player[(turn + 1) % 2 ] == "*"  else (200, 0, 0), (int(width / 2 - 120), int(height/2 - 5)), play_ring_radious)
+	TextSurf, TextRect = text_objects(" WON", largeText)
+	TextRect.center = ((width/2),(height/2))
+	screen.blit(TextSurf, TextRect)
+
+	pygame.display.update()
+
+	time.sleep(2)
 
 
 if __name__ == "__main__":
