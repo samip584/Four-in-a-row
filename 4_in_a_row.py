@@ -3,7 +3,6 @@ import random
 import time
 import pygame
 import pygame.gfxdraw
-import Arrow
 import sys
 
 board = []		#matrix denoting the board of the 4 in a row game
